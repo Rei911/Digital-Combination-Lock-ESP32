@@ -66,6 +66,7 @@ Mengirim perintah:
 - `CMD_UNLOCK`
 - `CMD_WRONG`
 - `CMD_LOCKOUT`
+
 LockControlTask memproses seluruh perintah ini:
 - Membuka / menutup servo
 - Mengatur LED
@@ -76,6 +77,7 @@ Melindungi akses variabel:
 - `entered`
 - `savedCode`
 - `lockState`
+  
 Digunakan oleh:
 - TaskEncoder
 - TaskOLED
