@@ -161,7 +161,7 @@ Digunakan oleh:
 
 
 
-**Wiring simulasi di wokwi**
+## **Wiring simulasi di wokwi**
 <img width="741" height="639" alt="image" src="https://github.com/user-attachments/assets/f1cd5d82-b4d3-4e9f-b74e-804f3bc0d16c" />
 
 
