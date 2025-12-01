@@ -61,64 +61,101 @@ Sistem dilengkapi lockout mode otomatis ketika terjadi kesalahan input sebanyak 
 
 ## 🔗 Arsitektur Komunikasi Antar Task
 
-### 📨 1. Queue — komunikasi OPEN/CLOSE ke ServoTask
-- ISR mengirim perintah `CMD_OPEN` / `CMD_CLOSE` ke **gateQueue**  
-- Servo task menunggu dan memproses perintah ini  
-- Queue dibersihkan saat emergency aktif
+### 📨 1. Queue — komunikasi antar-task (Verify → LockControl)
+Mengirim perintah:
+- `CMD_UNLOCK`
+- `CMD_WRONG`
+- `CMD_LOCKOUT`
+LockControlTask memproses seluruh perintah ini:
+- Membuka / menutup servo
+- Mengatur LED
+- Membunyikan buzzer
 
-### 🔒 2. Mutex — proteksi eksklusif servo
-- Servo tidak boleh dikendalikan dua task sekaligus  
-- ServoTask mengambil mutex sebelum menggerakkan servo  
-- EmergencyMonitorTask bisa menghentikan servo dengan mutex  
+### 🔒 2. Mutex — proteksi variabel kode
+Melindungi akses variabel:
+- `entered`
+- `savedCode`
+- `lockState`
+Digunakan oleh:
+- TaskEncoder
+- TaskOLED
+- TaskVerify 
 
-### 🚨 3. Binary Semaphore — Emergency ON/OFF
-- ISR tombol emergency memanggil `xSemaphoreGiveFromISR()`  
-- EmergencyMonitorTask menangkap sinyal tersebut  
-- Toggle otomatis ON/OFF
+### 🚦 3. Binary Semaphore — trigger verifikasi
+- TaskEncoder memberikan sinyal setiap kali 4 digit telah selesai
+- TaskVerify menangkap sinyal dan memproses kode
 
-### 🔁 4. Shared Variable
-- `emergency_activated` → status emergency  
-- `gate_is_open` → status servo  
-- `blocked_count` → jumlah perintah diblokir  
+### 🔁 4. Shared Variables
+`lockState` (LOCKED / UNLOCKED / ERROR / LOCKOUT)
+`digits[4]` (digit aktif)
+`digitIndex`
+`errorCount`
+`encoderValue`
 
 .............................................................................................................
 
 ## ⚙️ Metode yang Dipakai
 
-| Task                 | Core | Fungsi                        | Prioritas |
-|----------------------|------|-------------------------------|-----------|
-| Servo Task           | 0    | Menangani OPEN/CLOSE          | 3         |
-| Buzzer Task          | 0    | Mode alarm                     | 2         |
-| Emergency Monitor    | 1    | Mengawasi tombol emergency     | 4         |
-| LED Task             | 1    | Indikator status               | 1         |
+| Task            | Core | Fungsi                          | Prioritas |
+| --------------- | ---- | ------------------------------- | --------- |
+| TaskEncoder     | 1    | Membaca rotary encoder & tombol | 3         |
+| TaskOLED        | 1    | Menampilkan status ke OLED      | 2         |
+| TaskVerify      | 0    | Memvalidasi kode                | 4         |
+| TaskLockControl | 0    | Servo + LED + buzzer            | 5         |
+| TaskButton1     | 1    | Reset input manual              | 2         |
 
-- ISR Button untuk input cepat  
-- PWM Servo (50Hz) & Buzzer (dynamik freq)  
-- Emergency blocking → queue dibersihkan, servo berhenti, LED & buzzer warning mode  
+- Queue untuk komunikasi event verifikasi
+- Semaphore untuk trigger verifikasi
+- Mutex untuk proteksi variabel kode
+- Servo PWM 50Hz
+- Buzzer tone manual (tanpa timer konflik dengan PWM) 
 
 .............................................................................................................
 
 ## 🧩 Input dan Output Sistem
 
 ### Input
-- BTN_OPEN → kirim CMD_OPEN  
-- BTN_CLOSE → kirim CMD_CLOSE  
-- BTN_EMERGENCY → toggle emergency mode  
+- Rotary Encoder CW/CCW → memilih digit 0..9
+- Encoder SW → konfirmasi digit / lanjut ke digit berikutnya
+- Reset Button → reset kombinasi & status
 
 ### Output
-- Servo Motor → 0° (close) / 90° (open), pergerakan cepat bertahap  
-- Buzzer → Normal = silent, Emergency = beep cepat  
-- LED → Hijau = open, Merah = closed, Emergency = kedip cepat  
-- Serial Monitor → debug semua aktivitas  
+- Servo :
+  - 0° → Locked
+  - 90° → Unlocked
+- LED:
+  - Merah → Locked
+  - Hijau → Unlocked
+  - Biru → Error / Lockout
+- Buzzer:
+  - 1 beep → unlock
+  - 3 beep → wrong code
+  - Alarm 10 detik → lockout
+- OLED:
+  - Menampilkan digit aktif
+  - Status sistem secara real-time
 
 .............................................................................................................
 
 ## 🚀 Cara Kerja Sistem
 
-1. Tekan **OPEN** → ISR → Queue → Servo buka  
-2. Tekan **CLOSE** → ISR → Queue → Servo tutup  
-3. Tekan **EMERGENCY** → Servo berhenti, queue dikosongkan, LED & buzzer mode darurat  
-4. Tekan **EMERGENCY lagi** → Sistem kembali normal  
+1. Putar rotary encoder → memilih angka (digit 0–3).
+2. Tekan encoder → berpindah ke digit berikutnya.
+3. Setelah 4 digit selesai → TaskVerify aktif.
+4. Jika kode benar:
+- Servo membuka
+- LED hijau ON
+- Buzzer beep
+- 8 detik kemudian servo mengunci kembali
+5. Jika kode salah:
+- Error + buzzer 3x
+- LED biru sebentar
+- digit reset
+6. Jika salah 3 kali:
+- Masuk LOCKOUT 10 detik
+- LED biru nyala
+- Buzzer alarm
+- Sistem kembali LOCKED
 
 .............................................................................................................
 
