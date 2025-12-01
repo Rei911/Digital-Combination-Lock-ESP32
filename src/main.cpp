@@ -12,10 +12,8 @@
 #define LED3 16   // Error
 
 #define BUTTON1 13 // Reset input (optional)
-#define BUTTON2 12 // Lock kembali saat unlocked
 
 #define BUZZER_PIN 14
-#define POT_PIN 4
 
 #define ENC_CLK 18
 #define ENC_DT  19
@@ -23,9 +21,6 @@
 
 #define SERVO_PIN 10
 Servo myServo;
-
-#define STEP_PIN 6
-#define DIR_PIN  7
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -76,7 +71,6 @@ void TaskEncoder(void *parameter);
 void TaskOLED(void *parameter);
 void TaskVerify(void *parameter);
 void TaskButton1(void *parameter);
-void TaskButton2(void *parameter);
 void TaskLockControl(void *parameter);
 void setupTasks();
 
@@ -137,40 +131,6 @@ void resetPassword() {
 // =====================================================
 // =============== TASK DEFINISI ========================
 // =====================================================
-
-// ---------- TASK LED1 (CORE 0) ----------
-void TaskLED1(void *parameter) {
-  Serial.printf("✅ LED1 Task Running on Core %d\n", xPortGetCoreID());
-  for (;;) {
-    digitalWrite(LED1, HIGH);
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-    digitalWrite(LED1, LOW);
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-  }
-}
-
-// ---------- TASK LED2 (CORE 0) ----------
-void TaskLED2(void *parameter) {
-  Serial.printf("✅ LED2 Task Running on Core %d\n", xPortGetCoreID());
-  for (;;) {
-    digitalWrite(LED2, HIGH);
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-    digitalWrite(LED2, LOW);
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-  }
-}
-
-// ---------- TASK LED3 (CORE 1) ----------
-void TaskLED3(void *parameter) {
-  Serial.printf("✅ LED3 Task Running on Core %d\n", xPortGetCoreID());
-  for (;;) {
-    digitalWrite(LED3, HIGH);
-    vTaskDelay(700 / portTICK_PERIOD_MS);
-    digitalWrite(LED3, LOW);
-    vTaskDelay(700 / portTICK_PERIOD_MS);
-  }
-}
-
 // --- TaskButton1: reset input when BUTTON1 pressed ---
 void TaskButton1(void *pvParameters) {
     pinMode(BUTTON1, INPUT_PULLUP);
@@ -189,112 +149,6 @@ void TaskButton1(void *pvParameters) {
     }
 }
 
-
-// --- TaskButton2: just monitor button2 (already checked in Verify but keep as monitor) ---
-void TaskButton2(void *parameter) {
-    Serial.printf("✅ Button2 Task Running on Core %d\n", xPortGetCoreID());
-    pinMode(BUTTON2, INPUT_PULLUP);
-
-    for (;;) {
-        if (digitalRead(BUTTON2) == LOW) {
-
-            Serial.println("🔘 BUTTON2 pressed");
-
-            // Hanya bekerja jika sedang UNLOCKED
-            if (lockState == STATE_UNLOCKED) {
-                Serial.println("🔐 BUTTON2 → Force LOCK");
-
-                // Matikan LED2 (green), nyalakan LED1 (red)
-                digitalWrite(LED2, LOW);
-                digitalWrite(LED1, HIGH);
-
-                // Servo kembali ke LOCK
-                myServo.write(SERVO_LOCK_ANGLE);
-                Serial.println("🔒 Servo moved to LOCK");
-
-                // Kembalikan state
-                lockState = STATE_LOCKED;
-                Serial.println("🔄 State changed to LOCKED");
-
-                // Buzzer beep kecil
-                buzzerBeep(120);
-
-                // Reset input digit agar tidak membingungkan
-                for (int i = 0; i < 4; i++) digits[i] = 0;
-                digitIndex = 0;
-                entered = "";
-            }
-
-            // Debounce
-            vTaskDelay(pdMS_TO_TICKS(300));
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
-}
-
-
-// ---------- TASK BUZZER (CORE 0) ----------
-void TaskBuzzer(void *parameter) {
-  Serial.printf("✅ Buzzer Task Running on Core %d\n", xPortGetCoreID());
-  for (;;) {
-    buzzerTone(900, 100);
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-    noTone(BUZZER_PIN);
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-  }
-}
-
-// ---------- TASK POTENTIOMETER (CORE 0) ----------
-void TaskPot(void *parameter) {
-  Serial.printf("✅ Potensiometer Task Running on Core %d\n", xPortGetCoreID());
-  int lastVal = -1;
-  for (;;) {
-    int val = analogRead(POT_PIN);
-    if (abs(val - lastVal) > 30) { // ⛔ mencegah spam
-      Serial.printf("Pot Value: %d | Core %d\n", val, xPortGetCoreID());
-      lastVal = val;
-    }
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-  }
-}
-
-// ---------- TASK SERVO (CORE 0) ----------
-//void TaskServo(void *parameter) {
-//  Serial.printf("✅ Servo Task Running on Core %d\n", xPortGetCoreID());
-//  int angle = 0;
-//  int step = 2;
-//  for (;;) {
-//    myServo.write(angle);
-//    angle += step;
-//    if (angle >= 180 || angle <= 0) step = -step;
-//    vTaskDelay(20 / portTICK_PERIOD_MS);
-//  }
-//}
-
-// ---------- TASK STEPPER (CORE 1) ----------
-void TaskStepper(void *parameter) {
-  Serial.printf("✅ Stepper Task Running on Core %d\n", xPortGetCoreID());
-  pinMode(STEP_PIN, OUTPUT);
-  pinMode(DIR_PIN, OUTPUT);
-
-  int direction = HIGH;
-  digitalWrite(DIR_PIN, direction);
-  int stepCount = 0;
-
-  for (;;) {
-    digitalWrite(STEP_PIN, HIGH);
-    vTaskDelay(2 / portTICK_PERIOD_MS);
-    digitalWrite(STEP_PIN, LOW);
-    vTaskDelay(2 / portTICK_PERIOD_MS);
-
-    if (++stepCount >= 2000) {
-      direction = !direction;
-      digitalWrite(DIR_PIN, direction);
-      stepCount = 0;
-    }
-  }
-}
 
 // --- TaskOLED: tampilkan entered code + status ---
 void TaskOLED(void *parameter) {
@@ -665,7 +519,7 @@ void setup() {
 
   // Optional:
   xTaskCreatePinnedToCore(TaskButton1, "Btn1", 2048, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(TaskButton2, "Btn2", 2048, NULL, 2, NULL, 1);
+  
 }
 
 
