@@ -145,19 +145,19 @@ Digunakan oleh:
 2. Tekan encoder → berpindah ke digit berikutnya.
 3. Setelah 4 digit selesai → TaskVerify aktif.
 4. Jika kode benar:
--- Servo membuka
--- LED hijau ON
---Buzzer beep
--- 8 detik kemudian servo mengunci kembali
+  - Servo membuka
+  - LED hijau ON
+  - Buzzer beep
+  - 8 detik kemudian servo mengunci kembali
 5. Jika kode salah:
--- Error + buzzer 3x
--- LED biru sebentar
--- digit reset
+  - Error + buzzer 3x
+  - LED biru sebentar
+  - digit reset
 6. Jika salah 3 kali:
--- Masuk LOCKOUT 10 detik
--- LED biru nyala
--- Buzzer alarm
--- Sistem kembali LOCKED
+  - Masuk LOCKOUT 10 detik
+  - LED biru nyala
+  - Buzzer alarm
+  - Sistem kembali LOCKED
 
 
 
