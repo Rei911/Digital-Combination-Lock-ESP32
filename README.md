@@ -1,14 +1,14 @@
 # 🔐 Digital Combination Lock System
 **ESP32-S3 + FreeRTOS — Multicore Task, Queue, Semaphore, Mutex, Rotary Encoder, Servo Lock & OLED**
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Project ini merupakan sistem pengunci digital (combination lock) berbasis ESP32-S3 yang berjalan pada dual-core FreeRTOS.
 Pengguna memasukkan kombinasi menggunakan rotary encoder, sistem menampilkan status melalui OLED, dan mekanisme penguncian dilakukan oleh servo. LED dan Buzzer digunakan sebagai indikator status LOCKED / UNLOCKED / ERROR / LOCKOUT.
 
 Sistem dilengkapi lockout mode otomatis ketika terjadi kesalahan input sebanyak 3 kali.
 
-.............................................................................................................
+
 
 ## 📦 Komponen yang Digunakan
 
@@ -41,7 +41,7 @@ Sistem dilengkapi lockout mode otomatis ketika terjadi kesalahan input sebanyak 
 | OLED SCL     | 9    |
 
 
-.............................................................................................................
+
 
 ## 🛠 Fitur Utama
 
@@ -57,7 +57,7 @@ Sistem dilengkapi lockout mode otomatis ketika terjadi kesalahan input sebanyak 
 - Sinkronisasi thread menggunakan Queue, Semaphore, dan Mutex
 - Debug lengkap via Serial Monitor
 
-.............................................................................................................
+
 
 ## 🔗 Arsitektur Komunikasi Antar Task
 
@@ -92,7 +92,7 @@ Digunakan oleh:
 `errorCount`
 `encoderValue`
 
-.............................................................................................................
+
 
 ## ⚙️ Metode yang Dipakai
 
@@ -110,7 +110,7 @@ Digunakan oleh:
 - Servo PWM 50Hz
 - Buzzer tone manual (tanpa timer konflik dengan PWM) 
 
-.............................................................................................................
+
 
 ## 🧩 Input dan Output Sistem
 
@@ -135,7 +135,7 @@ Digunakan oleh:
   - Menampilkan digit aktif
   - Status sistem secara real-time
 
-.............................................................................................................
+
 
 ## 🚀 Cara Kerja Sistem
 
@@ -157,7 +157,6 @@ Digunakan oleh:
 - Buzzer alarm
 - Sistem kembali LOCKED
 
-.............................................................................................................
 
 
 **Wiring simulasi di wokwi**
