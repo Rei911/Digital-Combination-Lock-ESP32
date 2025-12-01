@@ -168,5 +168,4 @@ Digunakan oleh:
 ## **Video simulasi**
 
 
-https://github.com/user-attachments/assets/45314a1e-c9ea-45d7-b2e6-00caf5a18394
 
