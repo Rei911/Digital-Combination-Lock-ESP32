@@ -88,11 +88,11 @@ Digunakan oleh:
 - TaskVerify menangkap sinyal dan memproses kode
 
 ### 🔁 4. Shared Variables
-`lockState` (LOCKED / UNLOCKED / ERROR / LOCKOUT)
-`digits[4]` (digit aktif)
-`digitIndex`
-`errorCount`
-`encoderValue`
+- `lockState` (LOCKED / UNLOCKED / ERROR / LOCKOUT)
+- `digits[4]` (digit aktif)
+- `digitIndex`
+- `errorCount`
+- `encoderValue`
 
 
 
