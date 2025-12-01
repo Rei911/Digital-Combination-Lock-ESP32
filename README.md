@@ -67,7 +67,7 @@ Mengirim perintah:
 - `CMD_WRONG`
 - `CMD_LOCKOUT`
 
-LockControlTask memproses seluruh perintah ini:
+LockControlTask memproses seluruh perintah ini untuk:
 - Membuka / menutup servo
 - Mengatur LED
 - Membunyikan buzzer
