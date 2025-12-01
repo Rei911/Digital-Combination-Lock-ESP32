@@ -1,7 +1,7 @@
 # 🔐 Digital Combination Lock System
 **ESP32-S3 + FreeRTOS — Multicore Task, Queue, Semaphore, Mutex, Rotary Encoder, Servo Lock & OLED**
 
-.............................................................................................................
+................................................................................................................................................................................
 
 Project ini merupakan sistem pengunci digital (combination lock) berbasis ESP32-S3 yang berjalan pada dual-core FreeRTOS.
 Pengguna memasukkan kombinasi menggunakan rotary encoder, sistem menampilkan status melalui OLED, dan mekanisme penguncian dilakukan oleh servo. LED dan Buzzer digunakan sebagai indikator status LOCKED / UNLOCKED / ERROR / LOCKOUT.
