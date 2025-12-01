@@ -162,10 +162,10 @@ Digunakan oleh:
 
 
 ## **Wiring simulasi di wokwi**
-<img width="741" height="639" alt="image" src="https://github.com/user-attachments/assets/f1cd5d82-b4d3-4e9f-b74e-804f3bc0d16c" />
+<img width="1049" height="770" alt="Screenshot 2025-12-01 172245" src="https://github.com/user-attachments/assets/f3d28f94-6fc2-4863-bfc9-38aa824af35c" />
 
 
-**Video simulasi**
+## **Video simulasi**
 
 
 https://github.com/user-attachments/assets/45314a1e-c9ea-45d7-b2e6-00caf5a18394
